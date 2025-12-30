@@ -1,242 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>🌾 Upload or Capture Paddy Leaf Image</title>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #091718, #12858b);
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      color: #f0f0f0;
-    }
-
-    h1 {
-      color: #4cc550;
-      font-size: 2.8rem;
-      margin-bottom: 30px;
-      text-shadow: 1px 1px 5px rgba(0,0,0,0.2);
-    }
-
-    .nav-bar {
-      width: 100%;
-      background: linear-gradient(to right, #2cc88f, #0a5139);
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .nav-bar a {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 18px;
-      padding: 8px 16px;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-    }
-
-    .nav-bar a:hover {
-      background-color: #0d3930;
-      transform: translateY(-2px);
-    }
-
-    .upload-box {
-      border: 2px dashed #4CAF50;
-      background-color: #0f0d0d;
-      background: linear-gradient(to right, #092222, #050506);
-      padding: 2px 2px;
-      width: 100%;
-      max-width: 400px;
-      border-radius: 15px;
-      box-shadow: 0px 8px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      text-align: center;
-    }
-
-    input[type="file"], button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      transition: 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    video, canvas, img {
-      margin-top: 20px;
-      width: 300px;
-      border-radius: 10px;
-    }
-
-    .result {
-      margin-top: 30px;
-      font-size: 20px;
-      color: #333;
-      font-weight: 600;
-      background: #e8f5e9;
-      padding: 15px 20px;
-      border-radius: 10px;
-      display: inline-block;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-      animation: fadeIn 1s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    
-  </style>
-
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌾 Upload & Predict - Paddy Disease Identifier</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="../static/style.css">
+  <script src="{{ url_for('static', filename='translations.js') }}" defer></script>
 </head>
+
 <body>
 
-<!-- Navigation -->
-<div class="nav-bar">
-  <a href="home.html">Home</a>
-  <a href="upload.html">Upload</a>
-  <a href="about.html">About</a>
-  <a href="history.html">History</a>
-</div>
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <a href="{{ url_for('home') if url_for is defined else 'home.html' }}" data-i18n="home">Home</a>
+    <a href="{{ url_for('upload_page') if url_for is defined else 'upload.html' }}" data-i18n="upload">Upload</a>
+    <a href="{{ url_for('about_page') if url_for is defined else 'about.html' }}" data-i18n="about">About</a>
+    <a href="{{ url_for('history_page') if url_for is defined else 'history.html' }}" data-i18n="history">History</a>
+  </div>
 
+  <div class="hero">
+    <h1 data-i18n="upload_title">🌾 Disease Identification</h1>
+  </div>
 
-<h1>🌾 Paddy Leaf Disease Identifier</h1>
+  <div class="glass-card" style="max-width: 600px;">
+    <div class="upload-box" id="uploadSection">
+      <p data-i18n="upload_box_title" style="margin-bottom: 20px; font-weight: 600;">Upload Paddy Leaf Image</p>
+      <input type="file" id="fileInput" accept="image/*" style="display: none;">
+      <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()"
+        data-i18n="select_image">Select Image</button>
+      <div id="filePreviewContainer" style="margin-top: 15px; display: none; justify-content: center;">
+        <img id="fileThumbnail"
+          style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+      </div>
+      <p id="fileNameDisplay" style="margin-top: 10px; font-size: 0.8rem; opacity: 0.7;"></p>
+      <div style="margin-top: 25px;">
+        <button class="btn" onclick="uploadImage()" data-i18n="analyze_btn">Analyze Uploaded</button>
+      </div>
+    </div>
 
-<div class="upload-box">
-  <input type="file" id="fileInput" accept="image/*">
-  <br>
-  <button onclick="uploadImage()">Predict Uploaded</button>
-  <br><br>
-  <button onclick="openCamera()">Open Camera</button>
-  <button onclick="captureImage()">Capture & Predict</button>
-  <br>
-  <video id="video" autoplay playsinline></video>
-  <br>
-  <canvas id="canvas" style="display: none;"></canvas>
-</div>
+    <div id="cameraSection" style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--glass-border);">
+      <p data-i18n="capture_title" style="margin-bottom: 20px; font-weight: 600;">Capture from Camera</p>
+      <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" id="openCameraBtn" onclick="openCamera()" data-i18n="open_camera">Open
+          Camera</button>
+        <button class="btn" id="captureBtn" onclick="captureImage()" style="display: none;"
+          data-i18n="capture_btn">Capture & Analyze</button>
+        <button class="btn btn-secondary" id="cancelCameraBtn" onclick="cancelCamera()"
+          style="display: none; background: rgba(255,107,107,0.2); border-color: #ff6b6b; color: #ff6b6b;"
+          data-i18n="cancel_btn">Cancel</button>
+      </div>
 
-<div id="preview"></div>
-<div class="result" id="result"></div>
+      <div style="position: relative; display: flex; justify-content: center;">
+        <video id="video" autoplay playsinline
+          style="display: none; width: 100%; max-width: 400px; border-radius: 15px; border: 2px solid var(--primary);"></video>
+      </div>
+      <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+  </div>
 
-<script>
-  const video = document.getElementById("video");
-  const canvas = document.getElementById("canvas");
-  const resultDiv = document.getElementById("result");
+  <div id="previewContainer" class="glass-card" style="display: none; max-width: 500px; padding: 20px;">
+    <h3 data-i18n="preview_title" style="margin-top: 0; color: var(--primary);">Image Preview</h3>
+    <div id="preview" style="display: flex; justify-content: center;"></div>
+  </div>
 
-  function openCamera() {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-        video.style.display = "block";
-      })
-      .catch(err => {
-        alert("Camera access error: " + err.message);
-      });
-  }
+  <div id="resultContainer" class="glass-card" style="display: none; max-width: 500px; padding: 30px;">
+    <div class="result-card" id="result" style="border: none; background: transparent; padding: 0;"></div>
+  </div>
 
-  function captureImage() {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const context = canvas.getContext("2d");
-    context.drawImage(video, 0, 0);
+  <div style="margin-bottom: 50px; text-align: center; opacity: 0.7; font-size: 0.9rem;">
+    &copy; 2024 <span data-i18n="title">Paddy Leaf Disease Identifier</span>.
+  </div>
 
-    const stream = video.srcObject;
-    const tracks = stream.getTracks();
-    tracks.forEach(track => track.stop());
-    video.srcObject = null;
-    video.style.display = "none";
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const resultDiv = document.getElementById("result");
+    const resultContainer = document.getElementById("resultContainer");
+    const previewContainer = document.getElementById("previewContainer");
+    const captureBtn = document.getElementById("captureBtn");
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const filePreviewContainer = document.getElementById("filePreviewContainer");
+    const fileThumbnail = document.getElementById("fileThumbnail");
 
-    canvas.toBlob(blob => {
+    fileInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        fileNameDisplay.textContent = (localStorage.getItem('selectedLanguage') === 'ta' ? "தேர்ந்தெடுக்கப்பட்டது: " : (localStorage.getItem('selectedLanguage') === 'si' ? "තෝරා ගන්නා ලදී: " : "Selected: ")) + file.name;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          fileThumbnail.src = e.target.result;
+          filePreviewContainer.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
+
+        // Hide camera section when file is selected
+        document.getElementById('cameraSection').style.display = 'none';
+      }
+    });
+
+    function openCamera() {
+      // Hide upload section when opening camera
+      document.getElementById('uploadSection').style.display = 'none';
+
+      // Clear previous analysis results
+      previewContainer.style.display = 'none';
+      resultContainer.style.display = 'none';
+      document.getElementById('preview').innerHTML = '';
+      resultDiv.innerHTML = '';
+
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
+          video.play(); // Explicitly play the video
+          video.style.display = "block";
+          captureBtn.style.display = "inline-block";
+          document.getElementById('cancelCameraBtn').style.display = "inline-block";
+          document.getElementById('openCameraBtn').style.display = "none";
+          video.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(err => {
+          alert("Camera access error: " + err.message);
+          // Show upload section again if camera fails
+          document.getElementById('uploadSection').style.display = 'block';
+        });
+    }
+
+    function cancelCamera() {
+      // Stop camera stream
+      const stream = video.srcObject;
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+      video.srcObject = null;
+      video.style.display = "none";
+
+      // Hide capture and cancel buttons, show open camera button
+      captureBtn.style.display = "none";
+      document.getElementById('cancelCameraBtn').style.display = "none";
+      document.getElementById('openCameraBtn').style.display = "inline-block";
+
+      // Show upload section again
+      document.getElementById('uploadSection').style.display = 'block';
+    }
+
+    function captureImage() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0);
+
+      const stream = video.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      video.srcObject = null;
+      video.style.display = "none";
+      captureBtn.style.display = "none";
+
+      // Reset camera button states
+      document.getElementById('cancelCameraBtn').style.display = "none";
+      document.getElementById('openCameraBtn').style.display = "inline-block";
+
+      // After capturing, show upload section again
+      document.getElementById('uploadSection').style.display = 'block';
+
+      canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('file', blob, 'captured.jpg');
+        performPrediction(formData);
+      }, 'image/jpeg');
+    }
+
+    function uploadImage() {
+      if (fileInput.files.length === 0) {
+        alert(localStorage.getItem('selectedLanguage') === 'ta' ? 'தயவுசெய்து முதலில் ஒரு படத்தைத் தேர்ந்தெடுக்கவும்.' : (localStorage.getItem('selectedLanguage') === 'si' ? 'කරුණාකර පළමුව රූපයක් තෝරන්න.' : 'Please select an image first.'));
+        return;
+      }
+
+      const file = fileInput.files[0];
       const formData = new FormData();
-      formData.append('file', blob, 'captured.jpg');
+      formData.append('file', file);
 
-      fetch('http://localhost:5000/predict', {
+      // Show local preview immediately
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('preview').innerHTML = `<img src="${e.target.result}" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" />`;
+        previewContainer.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+
+      performPrediction(formData);
+
+      // After analyzing, show camera section again and reset file input
+      document.getElementById('cameraSection').style.display = 'block';
+      fileInput.value = '';
+      fileNameDisplay.textContent = '';
+      filePreviewContainer.style.display = 'none';
+    }
+
+    function performPrediction(formData) {
+      const lang = localStorage.getItem('selectedLanguage') || 'en';
+      const t = translations[lang];
+
+      resultDiv.innerHTML = `<p style='text-align: center;'>${lang === 'ta' ? 'படம் ஆய்வு செய்யப்படுகிறது... தயவுசெய்து காத்திருக்கவும்.' : (lang === 'si' ? 'පින්තූරය පරීක්ෂා කරමින් පවතී... කරුණාකර රැඳී සිටින්න.' : 'Analyzing image... Please wait.')}</p>`;
+      resultContainer.style.display = "block";
+      resultContainer.scrollIntoView({ behavior: "smooth" });
+
+      // Using relative path for better compatibility
+      fetch('/predict', {
         method: 'POST',
         body: formData
       })
-      .then(response => response.json())
-      .then(data => {
-        resultDiv.innerHTML = `
-          <div><strong>Prediction:</strong> <span>${data.prediction}</span></div>
-          <div><strong>Confidence:</strong> <span>${data.confidence}</span></div>
-          <div><strong>Solution:</strong> <span>${data.solution}</span></div>
+        .then(response => {
+          if (!response.ok) throw new Error("Server error: " + response.status);
+          return response.json();
+        })
+        .then(data => {
+          resultDiv.innerHTML = `
+          <h3 style="color: var(--primary); margin-bottom: 15px;">${t.diagnosis_results}</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                <span style="opacity: 0.7; display: block; font-size: 0.8rem;">${t.prediction_label}</span>
+                <strong style="font-size: 1.2rem; color: #fff;">${translateResult(data.prediction)}</strong>
+              </div>
+              <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+                <span style="opacity: 0.7; display: block; font-size: 0.8rem;">${t.confidence_label}</span>
+                <strong style="font-size: 1.2rem; color: var(--primary);">${data.confidence}</strong>
+              </div>
+              <div style="background: rgba(46, 204, 113, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid var(--primary);">
+                <span style="opacity: 0.7; display: block; font-size: 0.8rem; margin-bottom: 8px;">${t.solution_label}</span>
+                <p style="margin: 0; line-height: 1.5;">${translateResult(data.prediction, 'solution')}</p>
+              </div>
+          </div>
         `;
-        document.getElementById('preview').innerHTML = `<img src="data:image/jpeg;base64,${data.image}" />`;
-        scrollToResult();
-      })
-      .catch(err => {
-        resultDiv.textContent = "Prediction error: " + err.message;
-      });
-    }, 'image/jpeg');
-  }
-
-  function uploadImage() {
-    const fileInput = document.getElementById('fileInput');
-    if (fileInput.files.length === 0) {
-      alert('Please upload an image first.');
-      return;
+          // If server returns processed image, update preview
+          if (data.image) {
+            document.getElementById('preview').innerHTML = `<img src="data:image/jpeg;base64,${data.image}" style="max-width: 100%; border-radius: 12px;" />`;
+            previewContainer.style.display = "block";
+          }
+        })
+        .catch(err => {
+          resultDiv.innerHTML = `<div style="color: #ff6b6b; padding: 15px; background: rgba(255,107,107,0.1); border-radius: 10px;">Error: ${err.message}</div>`;
+        });
     }
-
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-
-    fetch('http://localhost:5000/predict', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      resultDiv.innerHTML = `
-        <div><strong>Prediction:</strong> <span>${data.prediction}</span></div>
-        <div><strong>Confidence:</strong> <span>${data.confidence}</span></div>
-        <div><strong>Solution:</strong> <span>${data.solution}</span></div>
-      `;
-      document.getElementById('preview').innerHTML = `<img src="data:image/jpeg;base64,${data.image}" />`;
-      scrollToResult();
-    })
-    .catch(error => {
-      resultDiv.textContent = "Error: " + error.message;
-    });
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('preview').innerHTML = `<img src="${e.target.result}" />`;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function scrollToResult() {
-    setTimeout(() => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-      });
-    }, 100);
-  }
-</script>
+  </script>
 
 </body>
+
 </html>

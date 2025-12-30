@@ -1,0 +1,41 @@
+
+# 🌾 Paddy Leaf Disease Identifier
+
+## Project Overview
+The Paddy Leaf Disease Identifier is a Flask-based web application designed to empower farmers and researchers by quickly identifying common diseases in paddy leaves. Powered by a state-of-the-art Convolutional Neural Network (CNN) build with TensorFlow/Keras, the system provides accurate diagnoses in seconds.
+
+## Key Features
+- **Instant Disease Detection**:  Upload an image or capture one using your device's camera to get immediate results.
+- **High Accuracy**: Utilizes a trained deep learning model (`paddyleaf_model.h5`) to classify leaf images.
+- **Actionable Solutions**:  Provides recommended treatments and solutions for every detected disease.
+- **Multi-Language Support**:  Accessible in English, Tamil, and Sinhala to support a wider range of users.
+- **History Tracking**:  Stores prediction history, including images, results, and confidence scores, in a MySQL database. User can view and manage their history.
+- **User-Friendly Interface**:  Modern, responsive design with glassmorphism aesthetics.
+
+## Detected Diseases
+The system is trained to identify the following conditions:
+1.  **Bacterial Leaf Blight**:  Fungal disease requiring copper-based fungicides.
+2.  **Brown Spot**:  Fungal disease managed with resistant varieties and crop rotation.
+3.  **Leaf Blast**:  Fungal disease treated with fungicides and proper irrigation.
+4.  **Leaf Scald**:  Fungal disease requiring reduction of leaf wetness and fungicides.
+5.  **Narrow Brown Spot**:  Fungal disease managed by removing infected debris and fungicides.
+6.  **Healthy**:  Indicates the leaf is free from the trained diseases.
+7.  **Not Paddy Leaf**:  Detects if the uploaded image is not relevant.
+
+## Technology Stack
+-   **Backend**: Python, Flask, MySQL
+-   **Frontend**: HTML5, CSS3, JavaScript
+-   **Machine Learning**: TensorFlow, Keras, NumPy, Pillow (PIL)
+-   **Database**: MySQL (for storing prediction history)
+
+## How to Use
+1.  **Home Page**: Choose your preferred language.
+2.  **Upload Page**: 
+    -   Select an image from your device or use the camera to capture a leaf.
+    -   Click "Analyze" to get the prediction.
+3.  **Results**: View the disease name, confidence score, and recommended solution.
+4.  **History Page**: Review past predictions. You can delete individual records or clear the entire history.
+5.  **About Page**: Learn more about the project and the diseases it detects.
+
+## Credits
+© 2024 Paddy Leaf Disease Identifier.
