@@ -1,0 +1,45 @@
+# Environment variables (contains secrets!)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Uploads (user-generated)
+uploads/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+error.txt
+error_log.txt
+output.txt
+
+# Large dataset images (not needed in deployment)
+images/
+validation/
+sample/
+
+# Instance folder
+instance/

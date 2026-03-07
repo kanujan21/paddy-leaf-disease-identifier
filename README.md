@@ -97,4 +97,4 @@ The system is trained to identify the following conditions:
 7. **Not Paddy Leaf** (Detection for non-relevant images)
 
 ---
-© 2024 Paddy Leaf Disease Identifier portfolio
+© 2024 Paddy Leaf Disease Identifier

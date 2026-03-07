@@ -9,6 +9,10 @@ import base64
 from io import BytesIO
 import mysql.connector
 from mysql.connector import Error
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (for local development)
+load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -38,10 +42,11 @@ solutions = {
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
-            host='localhost',
-            database='paddy_disease_db',
-            user='root',      # Adjust if necessary
-            password='user'       # Adjust if necessary
+            host=os.environ.get('DB_HOST', 'localhost'),
+            database=os.environ.get('DB_NAME', 'paddy_disease_db'),
+            user=os.environ.get('DB_USER', 'root'),
+            password=os.environ.get('DB_PASSWORD', 'user'),
+            port=int(os.environ.get('DB_PORT', 3306))
         )
         if connection.is_connected():
             return connection
@@ -212,4 +217,5 @@ def clear_history():
 # Run the app
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    debug = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
+    app.run(host='0.0.0.0', port=port, debug=debug)
